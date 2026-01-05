@@ -3,44 +3,37 @@ import pandas as pd
 import os
 
 # Path Resolution for Docker vs Local vs Cloud
-if os.path.exists("/data/processed"):
-    DATA_PATH = "/data"
-elif os.path.exists("data/processed"):
-    DATA_PATH = "data"
-elif os.path.exists("../data/processed"):
-    DATA_PATH = "../data"
-elif os.path.exists(os.path.join(os.path.dirname(__file__), "../data/processed")):
-    # Fallback using script location
-    DATA_PATH = os.path.join(os.path.dirname(__file__), "../data")
-else:
-    DATA_PATH = "data" # Default fallback
+# Path Resolution for Docker vs Local vs Cloud
+# We simply look for the data folder relative to the script execution
+possible_paths = [
+    "/data", # Docker
+    "data",  # Run from root
+    "../data", # Run from dashboard/
+    os.path.join(os.path.dirname(__file__), "../data") # Fallback
+]
+
+DATA_PATH = None
+for p in possible_paths:
+    if os.path.exists(os.path.join(p, "processed")):
+        DATA_PATH = p
+        break
+
+if DATA_PATH is None:
+    # DEBUG INFO FOR USER
+    st.error(f"❌ Data directory not found!")
+    st.code(f"Current Working Directory: {os.getcwd()}")
+    st.code(f"Script Location: {os.path.dirname(__file__)}")
+    st.code(f"Checked paths: {possible_paths}")
+    st.stop()
 
 PROCESSED_DIR = os.path.join(DATA_PATH, "processed")
 RAW_DIR = os.path.join(DATA_PATH, "raw")
 
-st.set_page_config(page_title="F1 Analytics Platform", layout="wide")
-
-st.title("🏎️ Formula 1 Data Engineering Platform")
-st.markdown("### Near-Real-Time Analytics Dashboard")
-
-# Helper to load data
-@st.cache_data
-def load_processed_parquet(folder_name):
-    path = os.path.join(PROCESSED_DIR, folder_name)
-    if os.path.exists(path):
-        return pd.read_parquet(path)
-    return None
-
-@st.cache_data
-def load_raw_csv(file_name):
-    path = os.path.join(RAW_DIR, file_name)
-    if os.path.exists(path):
-        return pd.read_csv(path)
-    return None
+st.sidebar.success(f"📂 Loaded data from: `{os.path.abspath(DATA_PATH)}`")
 
 # Check if data exists
 if not os.path.exists(PROCESSED_DIR):
-    st.error(f"Data directory not found at {PROCESSED_DIR}. Please run the pipeline first or ensure data is committed!")
+    st.error(f"Processed data not found at {PROCESSED_DIR}. Please run the pipeline first!")
     st.stop()
 
 # Layout

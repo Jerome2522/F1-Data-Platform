@@ -44,16 +44,6 @@ services:
     networks:
       - f1-network
 
-  dashboard:
-    build: ./dashboard
-    container_name: dashboard
-    ports:
-      - "8501:8501"
-    volumes:
-      - ./data:/data
-    networks:
-      - f1-network
-
 networks:
   f1-network:
     name: f1-network
