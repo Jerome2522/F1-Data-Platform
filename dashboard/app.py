@@ -2,9 +2,21 @@ import streamlit as st
 import pandas as pd
 import os
 
-# Constants
-PROCESSED_DIR = "/data/processed"
-RAW_DIR = "/data/raw"
+# Path Resolution for Docker vs Local vs Cloud
+if os.path.exists("/data/processed"):
+    DATA_PATH = "/data"
+elif os.path.exists("data/processed"):
+    DATA_PATH = "data"
+elif os.path.exists("../data/processed"):
+    DATA_PATH = "../data"
+elif os.path.exists(os.path.join(os.path.dirname(__file__), "../data/processed")):
+    # Fallback using script location
+    DATA_PATH = os.path.join(os.path.dirname(__file__), "../data")
+else:
+    DATA_PATH = "data" # Default fallback
+
+PROCESSED_DIR = os.path.join(DATA_PATH, "processed")
+RAW_DIR = os.path.join(DATA_PATH, "raw")
 
 st.set_page_config(page_title="F1 Analytics Platform", layout="wide")
 
@@ -28,7 +40,7 @@ def load_raw_csv(file_name):
 
 # Check if data exists
 if not os.path.exists(PROCESSED_DIR):
-    st.error("Data directory not found. Please run the pipeline first!")
+    st.error(f"Data directory not found at {PROCESSED_DIR}. Please run the pipeline first or ensure data is committed!")
     st.stop()
 
 # Layout
