@@ -1,18 +1,15 @@
-FROM python:3.9-slim
+FROM apache/spark:3.5.0-python3
 
-# Install OpenJDK 17
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    openjdk-17-jre-headless \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Set JAVA_HOME
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+USER root
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir pyspark pandas pyarrow
+# Install pandas dependencies if missing in base (usually numpy is there, but pandas might not be)
+# Apache spark python image has pyspark in path if used via spark-submit, 
+# but for direct python execution we need to ensure it's on PYTHONPATH or pip installed.
+# Installing via pip ensures it works with standard python execution.
+RUN pip install --no-cache-dir pyspark==3.5.0 pandas pyarrow
 
 COPY process_f1_data.py .
 
-CMD ["python", "process_f1_data.py"]
+CMD ["python3", "process_f1_data.py"]

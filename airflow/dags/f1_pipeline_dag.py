@@ -35,6 +35,7 @@ with DAG(
         auto_remove=True,
         docker_url='unix://var/run/docker.sock',
         network_mode='f1-network',
+        mount_tmp_dir=False,
         mounts=[
             Mount(source=HOST_DATA_PATH, target='/data', type='bind'),
         ],
@@ -49,10 +50,11 @@ with DAG(
         auto_remove=True,
         docker_url='unix://var/run/docker.sock',
         network_mode='f1-network',
+        mount_tmp_dir=False,
         mounts=[
             Mount(source=HOST_DATA_PATH, target='/data', type='bind'),
         ],
-        command='python process_f1_data.py'
+        command='python3 process_f1_data.py'
     )
 
     start >> ingest_task >> process_task >> end
