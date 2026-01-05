@@ -43,8 +43,7 @@ def main():
     constructor_standings.write.mode("overwrite").parquet(f"{PROCESSED_DIR}/constructor_standings.parquet")
     print("Computed Constructor Standings.")
 
-    # 3. Top Drivers by Total Wins (In this dataset, effectively wins in the season)
-    # Filter where position = 1
+    # 3. Top Drivers by Total Wins
     wins_df = results_df.filter(col("position") == 1) \
         .groupBy("driver_id") \
         .count().alias("wins") \
@@ -57,8 +56,6 @@ def main():
     print("Computed Driver Wins.")
 
     # 4. Driver Points Progression
-    # Calculate cumulative sum of points over races
-    # Join with races to get date/round order
     results_with_race = results_df.join(races_df, results_df.race_id == races_df.round, "inner") \
         .select(results_df.driver_id, races_df.round, races_df.name.alias("race_name"), results_df.points)
     
@@ -72,16 +69,6 @@ def main():
     print("Computed Points Progression.")
 
     # 5. Driver Consistency Index
-    # Based on stddev of finishing position (lower is better)
-    # Filter out DNFs if necessary? "Average finishing position and variance".
-    # Assuming position_order contains valid integers or we cast it.
-    finished_races = results_df.filter(col("status").rlike("Finished|\\+1 Lap|\\+.*")) # Simplified "Finished" logic or just take all requiring a numeric position
-    # Actually simpler: cast 'positionText' to int, if fails it's DNF?
-    # results_df has 'position' (integer usually) but 2023 data might have 'R' for retired.
-    # Ergast 'position' field is usually the final classification. If DNF, it might be the last position.
-    # Let's use 'position_order' which is strictly numeric in Ergast DB dumps, but from API CSV process_results writes 'position_order' as same as 'position'.
-    # I'll rely on casting `position` to int.
-    
     consistency_df = results_df.withColumn("position_int", col("position").cast("int")) \
         .filter(col("position_int").isNotNull()) \
         .groupBy("driver_id") \
@@ -91,19 +78,12 @@ def main():
         ) \
         .join(drivers_df, "driver_id") \
         .select("driver_id", "forename", "surname", "avg_position", "position_variance") \
-        .orderBy("position_variance") # Lower variance = more consistent
+        .orderBy("position_variance")
         
     consistency_df.write.mode("overwrite").parquet(f"{PROCESSED_DIR}/driver_consistency.parquet")
     print("Computed Consistency Index.")
 
     # 6. Constructor Reliability Score
-    # Percentage of races finished (non-DNF)
-    # Status ID 1 is "Finished". But status texts vary.
-    # We'll valid status as NOT 'Retired', 'Collision', 'Accident', 'Engine', etc.
-    # Or simpler: count status != 'Finished' vs total?
-    # Let's define "Reliable" as status like 'Finished' or '+X Laps'.
-    # Simplest proxy: if 'position_text' is numeric (integer) -> finished. 'R', 'D', 'W' -> not finished.
-    
     reliability_df = results_df.withColumn("is_finished", when(col("position_text").rlike("^[0-9]+$"), 1).otherwise(0)) \
         .groupBy("constructor_id") \
         .agg(
@@ -119,8 +99,6 @@ def main():
     print("Computed Reliability Score.")
     
     # 7. Points Efficiency
-    # Total points / races entered
-    # We already have this roughly in standings but let's make it explicit
     efficiency_df = results_df.groupBy("driver_id") \
         .agg(sum("points").alias("total_points"), count("race_id").alias("races_entered")) \
         .withColumn("points_efficiency", col("total_points") / col("races_entered")) \

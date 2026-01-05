@@ -25,10 +25,10 @@ st.markdown("### Near-Real-Time Analytics Dashboard")
 
 # Helper to load data
 @st.cache_data
-def load_processed_csv(file_name):
-    path = os.path.join(PROCESSED_DIR, file_name)
+def load_processed_parquet(folder_name):
+    path = os.path.join(PROCESSED_DIR, folder_name)
     if os.path.exists(path):
-        return pd.read_csv(path)
+        return pd.read_parquet(path)
     return None
 
 @st.cache_data
@@ -51,7 +51,7 @@ with tab1:
     
     with col1:
         st.subheader("Driver Standings (Season 2023)")
-        df_drivers = load_processed_csv("driver_standings.csv")
+        df_drivers = load_processed_parquet("driver_standings.parquet")
 
         if df_drivers is not None:
             st.dataframe(df_drivers.style.highlight_max(axis=0, subset=['total_points']), use_container_width=True)
@@ -60,7 +60,7 @@ with tab1:
 
     with col2:
         st.subheader("Constructor Standings")
-        df_constructors = load_processed_csv("constructor_standings.csv")
+        df_constructors = load_processed_parquet("constructor_standings.parquet")
         if df_constructors is not None:
             st.dataframe(df_constructors, use_container_width=True)
         else:
@@ -83,7 +83,7 @@ with tab1:
 
 with tab2:
     st.subheader("Driver Points Progression")
-    df_progression = load_processed_csv("driver_points_progression.csv")
+    df_progression = load_processed_parquet("driver_points_progression.parquet")
     if df_progression is not None:
         # Pivot for line chart: index=race_name/round, columns=driver, values=cumulative_points
         # Filter top 10 drivers for clarity
@@ -103,7 +103,7 @@ with tab3:
     with col1:
         st.subheader("Driver Consistency Index")
         st.caption("Lower variance = More consistent finishes")
-        df_consistency = load_processed_csv("driver_consistency.csv")
+        df_consistency = load_processed_parquet("driver_consistency.parquet")
         if df_consistency is not None:
             st.dataframe(df_consistency.head(10), use_container_width=True)
         else:
@@ -112,7 +112,7 @@ with tab3:
     with col2:
         st.subheader("Constructor Reliability Score")
         st.caption("% of races finished without DNF")
-        df_reliability = load_processed_csv("constructor_reliability.csv")
+        df_reliability = load_processed_parquet("constructor_reliability.parquet")
         if df_reliability is not None:
             st.dataframe(df_reliability, use_container_width=True)
         else:
@@ -120,6 +120,6 @@ with tab3:
 
     st.subheader("Points Efficiency")
     st.caption("Average points per race entered")
-    df_efficiency = load_processed_csv("points_efficiency.csv")
+    df_efficiency = load_processed_parquet("points_efficiency.parquet")
     if df_efficiency is not None:
         st.bar_chart(df_efficiency.head(10), x='surname', y='points_efficiency')

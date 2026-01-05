@@ -36,6 +36,8 @@ with DAG(
         docker_url='unix://var/run/docker.sock',
         network_mode='f1-network',
         mount_tmp_dir=False,
+        retries=1,
+        execution_timeout=None,
         mounts=[
             Mount(source=HOST_DATA_PATH, target='/data', type='bind'),
         ],
