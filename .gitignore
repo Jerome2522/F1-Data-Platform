@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
+
+# Airflow
+airflow/airflow.db
+airflow/airflow.cfg
+airflow/webserver_config.py
+airflow/logs/
+airflow/standalone_admin_password.txt
+
+# Docker
+.docker/
+
+# Data (Don't commit data)
+data/raw/*
+data/processed/*
+!data/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
