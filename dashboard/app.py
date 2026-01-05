@@ -5,25 +5,61 @@ import os
 # Path Resolution for Docker vs Local vs Cloud
 # Path Resolution for Docker vs Local vs Cloud
 # We simply look for the data folder relative to the script execution
-possible_paths = [
-    "/data", # Docker
-    "data",  # Run from root
-    "../data", # Run from dashboard/
-    os.path.join(os.path.dirname(__file__), "../data") # Fallback
-]
-
+# Path Resolution for Docker vs Local vs Cloud
+# Recursive search to find 'processed' directory anywhere
 DATA_PATH = None
-for p in possible_paths:
-    if os.path.exists(os.path.join(p, "processed")):
-        DATA_PATH = p
-        break
+
+def find_data_recursive(start_path):
+    for root, dirs, files in os.walk(start_path):
+        if "processed" in dirs:
+            return root
+    return None
+
+# Check current dir and parents
+current_path = os.getcwd()
+# Search down
+DATA_PATH = find_data_recursive(current_path)
+
+# If not found, search up one level and down
+if DATA_PATH is None:
+    parent = os.path.dirname(current_path)
+    DATA_PATH = find_data_recursive(parent)
+
+# Check fallback locations explicitly
+if DATA_PATH is None:
+    possible_paths = [
+        "/data", 
+        "data",
+        "../data",
+        os.path.join(os.path.dirname(__file__), "../data")
+    ]
+    for p in possible_paths:
+        if os.path.exists(os.path.join(p, "processed")):
+            DATA_PATH = p
+            break
 
 if DATA_PATH is None:
     # DEBUG INFO FOR USER
     st.error(f"❌ Data directory not found!")
+    
+    st.markdown("### Debugging Info")
     st.code(f"Current Working Directory: {os.getcwd()}")
     st.code(f"Script Location: {os.path.dirname(__file__)}")
-    st.code(f"Checked paths: {possible_paths}")
+    
+    # List files in current directory to help debug
+    st.markdown("### Files in Current Dir:")
+    try:
+        st.code(str(os.listdir(os.getcwd())))
+    except:
+        st.write("Could not list current dir")
+
+    # List files in parent directory
+    st.markdown("### Files in Parent Dir:")
+    try:
+        st.code(str(os.listdir(os.path.dirname(os.getcwd()))))
+    except:
+        st.write("Could not list parent dir")
+
     st.stop()
 
 PROCESSED_DIR = os.path.join(DATA_PATH, "processed")
