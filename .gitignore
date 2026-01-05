@@ -25,7 +25,8 @@ data/raw/*
 !data/raw/*.csv
 
 data/processed/*
-!data/processed/*.csv
+!data/processed/*.parquet/
+!data/processed/*.parquet/**
 !data/.gitkeep
 
 # OS
