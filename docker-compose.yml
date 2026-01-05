@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  airflow:
+    build: ./airflow
+    container_name: airflow
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data
+      - ./airflow/dags:/opt/airflow/dags
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+      - _AIRFLOW_DB_UPGRADE=true
+      - _AIRFLOW_WWW_USER_CREATE=true
+      - _AIRFLOW_WWW_USER_USERNAME=admin
+      - _AIRFLOW_WWW_USER_PASSWORD=admin
+      - HOST_DATA_PATH=./data
+    # Initialize DB, create user, and start webserver + scheduler in one container for simplicity
+    command: bash -c "airflow db init && airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin && airflow webserver & airflow scheduler"
+    networks:
+      - f1-network
+
+  ingestion:
+    build: ./ingestion
+    image: f1-data-platform-ingestion:latest
+    container_name: ingestion
+    profiles: [ "jobs" ]
+    volumes:
+      - ./data:/data
+    networks:
+      - f1-network
+
+  spark:
+    build: ./spark
+    image: f1-data-platform-spark:latest
+    container_name: spark
+    profiles: [ "jobs" ]
+    volumes:
+      - ./data:/data
+    networks:
+      - f1-network
+
+  dashboard:
+    build: ./dashboard
+    container_name: dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/data
+    networks:
+      - f1-network
+
+networks:
+  f1-network:
+    driver: bridge
