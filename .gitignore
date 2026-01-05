@@ -20,9 +20,13 @@ airflow/standalone_admin_password.txt
 .docker/
 
 # Data (Don't commit data)
+# Data (Don't commit data generally)
 data/raw/*
+!data/raw/*.csv
+
 data/processed/*
-!data/processed/*.parquet
+!data/processed/*.parquet/
+!data/processed/*.parquet/**
 !data/.gitkeep
 
 # OS
