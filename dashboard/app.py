@@ -51,8 +51,7 @@ with tab1:
     
     with col1:
         st.subheader("Driver Standings (Season 2023)")
-# ... (This logic will be handled by the replace tool matching the target content)
-# Since there are multiple calls, I will use AllowMultiple=True and target the distinct calls or use regex if supported, but here exact string replacement is safer.
+        df_drivers = load_processed_csv("driver_standings.csv")
 
         if df_drivers is not None:
             st.dataframe(df_drivers.style.highlight_max(axis=0, subset=['total_points']), use_container_width=True)
