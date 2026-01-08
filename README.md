@@ -63,6 +63,11 @@ The pipeline calculates the following metrics:
 -   **Constructor Reliability**: Percentage of races where the car finished (non-DNF).
 -   **Points Efficiency**: Average points scored per race entered.
 
+## Example Dashboard 
+
+<img width="1920" height="1673" alt="image" src="https://github.com/user-attachments/assets/247a0032-7d8c-4bb8-bd1a-2b537fb694c7" />
+
+
 ## ⚠️ Honesty Note
 “This platform is refresh-based (near–real-time). Due to API limitations and infrastructure costs, the pipeline is triggered manually via Airflow rather than continuously streaming live race data.”
 
