@@ -56,7 +56,7 @@ def main():
     print("Computed Driver Wins.")
 
     # 4. Driver Points Progression
-    results_with_race = results_df.join(races_df, results_df.race_id == races_df.round, "inner") \
+    results_with_race = results_df.join(races_df, "race_id", "inner") \
         .select(results_df.driver_id, races_df.round, races_df.name.alias("race_name"), results_df.points)
     
     window_spec = Window.partitionBy("driver_id").orderBy("round").rowsBetween(Window.unboundedPreceding, Window.currentRow)

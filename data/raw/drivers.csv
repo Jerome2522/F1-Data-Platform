@@ -1,23 +1,41 @@
 driver_id,number,code,url,forename,surname,dateOfBirth,nationality
-albon,23,ALB,http://en.wikipedia.org/wiki/Alexander_Albon,Alexander,Albon,1996-03-23,Thai
 alonso,14,ALO,http://en.wikipedia.org/wiki/Fernando_Alonso,Fernando,Alonso,1981-07-29,Spanish
 bottas,77,BOT,http://en.wikipedia.org/wiki/Valtteri_Bottas,Valtteri,Bottas,1989-08-28,Finnish
+ericsson,9,ERI,http://en.wikipedia.org/wiki/Marcus_Ericsson,Marcus,Ericsson,1990-09-02,Swedish
 gasly,10,GAS,http://en.wikipedia.org/wiki/Pierre_Gasly,Pierre,Gasly,1996-02-07,French
+grosjean,8,GRO,http://en.wikipedia.org/wiki/Romain_Grosjean,Romain,Grosjean,1986-04-17,French
 hamilton,44,HAM,http://en.wikipedia.org/wiki/Lewis_Hamilton,Lewis,Hamilton,1985-01-07,British
+brendon_hartley,28,HAR,http://en.wikipedia.org/wiki/Brendon_Hartley,Brendon,Hartley,1989-11-10,New Zealander
 hulkenberg,27,HUL,http://en.wikipedia.org/wiki/Nico_H%C3%BClkenberg,Nico,Hülkenberg,1987-08-19,German
-lawson,30,LAW,http://en.wikipedia.org/wiki/Liam_Lawson,Liam,Lawson,2002-02-11,New Zealander
 leclerc,16,LEC,http://en.wikipedia.org/wiki/Charles_Leclerc,Charles,Leclerc,1997-10-16,Monegasque
 kevin_magnussen,20,MAG,http://en.wikipedia.org/wiki/Kevin_Magnussen,Kevin,Magnussen,1992-10-05,Danish
-norris,4,NOR,http://en.wikipedia.org/wiki/Lando_Norris,Lando,Norris,1999-11-13,British
 ocon,31,OCO,http://en.wikipedia.org/wiki/Esteban_Ocon,Esteban,Ocon,1996-09-17,French
-piastri,81,PIA,http://en.wikipedia.org/wiki/Oscar_Piastri,Oscar,Piastri,2001-04-06,Australian
 perez,11,PER,http://en.wikipedia.org/wiki/Sergio_P%C3%A9rez,Sergio,Pérez,1990-01-26,Mexican
 ricciardo,3,RIC,http://en.wikipedia.org/wiki/Daniel_Ricciardo,Daniel,Ricciardo,1989-07-01,Australian
-russell,63,RUS,http://en.wikipedia.org/wiki/George_Russell_(racing_driver),George,Russell,1998-02-15,British
+raikkonen,7,RAI,http://en.wikipedia.org/wiki/Kimi_R%C3%A4ikk%C3%B6nen,Kimi,Räikkönen,1979-10-17,Finnish
 sainz,55,SAI,http://en.wikipedia.org/wiki/Carlos_Sainz_Jr.,Carlos,Sainz,1994-09-01,Spanish
-sargeant,2,SAR,http://en.wikipedia.org/wiki/Logan_Sargeant,Logan,Sargeant,2000-12-31,American
+sirotkin,35,SIR,http://en.wikipedia.org/wiki/Sergey_Sirotkin_(racing_driver),Sergey,Sirotkin,1995-08-27,Russian
 stroll,18,STR,http://en.wikipedia.org/wiki/Lance_Stroll,Lance,Stroll,1998-10-29,Canadian
-tsunoda,22,TSU,http://en.wikipedia.org/wiki/Yuki_Tsunoda,Yuki,Tsunoda,2000-05-11,Japanese
+vandoorne,2,VAN,http://en.wikipedia.org/wiki/Stoffel_Vandoorne,Stoffel,Vandoorne,1992-03-26,Belgian
 max_verstappen,3,VER,http://en.wikipedia.org/wiki/Max_Verstappen,Max,Verstappen,1997-09-30,Dutch
+vettel,5,VET,http://en.wikipedia.org/wiki/Sebastian_Vettel,Sebastian,Vettel,1987-07-03,German
+albon,23,ALB,http://en.wikipedia.org/wiki/Alexander_Albon,Alexander,Albon,1996-03-23,Thai
+giovinazzi,99,GIO,http://en.wikipedia.org/wiki/Antonio_Giovinazzi,Antonio,Giovinazzi,1993-12-14,Italian
+kubica,88,KUB,http://en.wikipedia.org/wiki/Robert_Kubica,Robert,Kubica,1984-12-07,Polish
+kvyat,26,KVY,http://en.wikipedia.org/wiki/Daniil_Kvyat,Daniil,Kvyat,1994-04-26,Russian
+norris,4,NOR,http://en.wikipedia.org/wiki/Lando_Norris,Lando,Norris,1999-11-13,British
+russell,63,RUS,http://en.wikipedia.org/wiki/George_Russell_(racing_driver),George,Russell,1998-02-15,British
+aitken,89,AIT,http://en.wikipedia.org/wiki/Jack_Aitken,Jack,Aitken,1995-09-23,British
+pietro_fittipaldi,51,FIT,http://en.wikipedia.org/wiki/Pietro_Fittipaldi,Pietro,Fittipaldi,1996-06-25,Brazilian
+latifi,6,LAT,http://en.wikipedia.org/wiki/Nicholas_Latifi,Nicholas,Latifi,1995-06-29,Canadian
+mick_schumacher,47,MSC,http://en.wikipedia.org/wiki/Mick_Schumacher,Mick,Schumacher,1999-03-22,German
+tsunoda,22,TSU,http://en.wikipedia.org/wiki/Yuki_Tsunoda,Yuki,Tsunoda,2000-05-11,Japanese
 zhou,24,ZHO,http://en.wikipedia.org/wiki/Zhou_Guanyu,Guanyu,Zhou,1999-05-30,Chinese
 de_vries,21,DEV,http://en.wikipedia.org/wiki/Nyck_de_Vries,Nyck,de Vries,1995-02-06,Dutch
+lawson,30,LAW,http://en.wikipedia.org/wiki/Liam_Lawson,Liam,Lawson,2002-02-11,New Zealander
+piastri,81,PIA,http://en.wikipedia.org/wiki/Oscar_Piastri,Oscar,Piastri,2001-04-06,Australian
+sargeant,2,SAR,http://en.wikipedia.org/wiki/Logan_Sargeant,Logan,Sargeant,2000-12-31,American
+antonelli,12,ANT,https://en.wikipedia.org/wiki/Andrea_Kimi_Antonelli,Andrea Kimi,Antonelli,2006-08-25,Italian
+bearman,87,BEA,http://en.wikipedia.org/wiki/Oliver_Bearman,Oliver,Bearman,2005-05-08,British
+colapinto,43,COL,http://en.wikipedia.org/wiki/Franco_Colapinto,Franco,Colapinto,2003-05-27,Argentine
+doohan,7,DOO,http://en.wikipedia.org/wiki/Jack_Doohan,Jack,Doohan,2003-01-20,Australian

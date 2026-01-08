@@ -7,7 +7,7 @@ import time
 # Ergast is deprecated/unstable. Using Jolpica mirror which is compatible.
 BASE_URL = "http://api.jolpi.ca/ergast/f1"
 DATA_DIR = "/data/raw"
-SEASON = "2023" # Focusing on 2023 for analysis (Ergast v1 style)
+SEASONS = range(2018, 2025) # 2018 to 2024 (inclusive)
 
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
@@ -22,42 +22,49 @@ def fetch_data(endpoint):
         "Accept": "application/json"
     }
     
-    print(f"Fetching {url}...")
+    # print(f"Fetching {url}...") 
+    # print is annoying in logs 
     # Timeout added, strict SSL enabled (verify=True is default)
-    response = requests.get(url, headers=headers, timeout=20)
-    response.raise_for_status()
-    return response.json()
+    try:
+        response = requests.get(url, headers=headers, timeout=20)
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        print(f"Error fetching {url}: {e}")
+        return None
 
-def process_drivers(data):
-    if not data: return
+def process_drivers(data, existing_df=None):
+    if not data: return existing_df
     drivers = data['MRData']['DriverTable']['Drivers']
     df = pd.DataFrame(drivers)
     # Rename for clarity
     df = df.rename(columns={'driverId': 'driver_id', 'permanentNumber': 'number', 
                             'givenName': 'forename', 'familyName': 'surname'})
-    output_path = f"{DATA_DIR}/drivers.csv"
-    df.to_csv(output_path, index=False)
-    print(f"Saved drivers to {output_path}")
+    
+    if existing_df is not None:
+        return pd.concat([existing_df, df]).drop_duplicates(subset=['driver_id'])
+    return df
 
-def process_constructors(data):
-    if not data: return
+def process_constructors(data, existing_df=None):
+    if not data: return existing_df
     constructors = data['MRData']['ConstructorTable']['Constructors']
     df = pd.DataFrame(constructors)
     df = df.rename(columns={'constructorId': 'constructor_id', 'name': 'name', 'nationality': 'nationality'})
-    output_path = f"{DATA_DIR}/constructors.csv"
-    df.to_csv(output_path, index=False)
-    print(f"Saved constructors to {output_path}")
+    
+    if existing_df is not None:
+        return pd.concat([existing_df, df]).drop_duplicates(subset=['constructor_id'])
+    return df
 
-def process_races(data):
-    if not data: return
+def process_races(data, existing_df=None):
+    if not data: return existing_df
     races = data['MRData']['RaceTable']['Races']
     # Extract relevant fields
     race_list = []
     for r in races:
         race_info = {
-            'race_id': r.get('round'), # Using round as ID for season specific
-            'year': r.get('season'),
-            'round': r.get('round'),
+            'race_id': int(r.get('round')) + (int(r.get('season')) * 100), # Synthetic unique ID (e.g. 202301)
+            'year': int(r.get('season')),
+            'round': int(r.get('round')),
             'circuit_id': r['Circuit']['circuitId'],
             'name': r['raceName'],
             'date': r['date']
@@ -65,11 +72,11 @@ def process_races(data):
         race_list.append(race_info)
     
     df = pd.DataFrame(race_list)
-    output_path = f"{DATA_DIR}/races.csv"
-    df.to_csv(output_path, index=False)
-    print(f"Saved races to {output_path}")
+    if existing_df is not None:
+        return pd.concat([existing_df, df]).drop_duplicates(subset=['race_id'])
+    return df
 
-def process_results(season):
+def process_results(season, existing_df=None):
     """
     Fetches results for all races in the season.
     """
@@ -77,15 +84,15 @@ def process_results(season):
     
     # Correct endpoint for results
     data = fetch_data(f"{season}/results")
-    if not data: return
+    if not data: return existing_df
 
     races = data['MRData']['RaceTable']['Races']
     for race in races:
-        race_round = race['round']
+        race_id = int(race['round']) + (int(race['season']) * 100) # Match race_id logic
         for result in race['Results']:
             row = {
                 'result_id': f"{race['season']}_{race['round']}_{result['position']}", # Synthetic primary key
-                'race_id': race_round, # Join key with races
+                'race_id': race_id, # Join key with races
                 'driver_id': result['Driver']['driverId'],
                 'constructor_id': result['Constructor']['constructorId'],
                 'number': result.get('number'),
@@ -100,36 +107,61 @@ def process_results(season):
             all_results.append(row)
     
     df = pd.DataFrame(all_results)
-    output_path = f"{DATA_DIR}/results.csv"
-    df.to_csv(output_path, index=False)
-    print(f"Saved results to {output_path}")
+    if existing_df is not None:
+        return pd.concat([existing_df, df]).drop_duplicates(subset=['result_id'])
+    return df
 
 def file_exists(name):
+    # For multi-season, we want to force refresh if we are expanding scope
+    # But for now, let's keep it simple: if files exist, we assume they are good. 
+    # Use "rm -rf data/raw" to force re-ingest.
     return os.path.exists(os.path.join(DATA_DIR, name))
 
 def main():
-    print("Starting F1 Data Ingestion...")
+    print(f"Starting F1 Data Ingestion for seasons: {list(SEASONS)}...")
     
-    # Idempotency check
-    if file_exists("drivers.csv") and file_exists("constructors.csv") \
-       and file_exists("races.csv") and file_exists("results.csv"):
-        print("Raw data already exists. Skipping ingestion.")
-        return
+    # We will aggregate data in memory then save
+    all_drivers = None
+    all_constructors = None
+    all_races = None
+    all_results = None
 
-    # 1. Drivers (All drivers for the season)
-    drivers_data = fetch_data(f"{SEASON}/drivers")
-    process_drivers(drivers_data)
-    
-    # 2. Constructors
-    constructors_data = fetch_data(f"{SEASON}/constructors")
-    process_constructors(constructors_data)
-    
-    # 3. Races
-    races_data = fetch_data(f"{SEASON}/races") # Fixed endpoint based on user feedback to be explicit
-    process_races(races_data)
-    
-    # 4. Results
-    process_results(SEASON)
+    for season in SEASONS:
+        print(f"Processing Season {season}...")
+        
+        # 1. Drivers
+        drivers_data = fetch_data(f"{season}/drivers")
+        all_drivers = process_drivers(drivers_data, all_drivers)
+        
+        # 2. Constructors
+        constructors_data = fetch_data(f"{season}/constructors")
+        all_constructors = process_constructors(constructors_data, all_constructors)
+        
+        # 3. Races
+        races_data = fetch_data(f"{season}/races")
+        all_races = process_races(races_data, all_races)
+        
+        # 4. Results
+        all_results = process_results(season, all_results)
+        
+        time.sleep(1) # Be polite between seasons
+
+    # Save aggregated data
+    if all_drivers is not None:
+        all_drivers.to_csv(f"{DATA_DIR}/drivers.csv", index=False)
+        print(f"Saved {len(all_drivers)} drivers.")
+
+    if all_constructors is not None:
+        all_constructors.to_csv(f"{DATA_DIR}/constructors.csv", index=False)
+        print(f"Saved {len(all_constructors)} constructors.")
+
+    if all_races is not None:
+        all_races.to_csv(f"{DATA_DIR}/races.csv", index=False)
+        print(f"Saved {len(all_races)} races.")
+
+    if all_results is not None:
+        all_results.to_csv(f"{DATA_DIR}/results.csv", index=False)
+        print(f"Saved {len(all_results)} results.")
     
     print("Ingestion complete!")
 
